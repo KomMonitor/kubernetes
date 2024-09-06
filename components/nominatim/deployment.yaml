@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nominatim
+  labels:
+    app: nominatim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nominatim
+  template:
+    metadata:
+      labels:
+        app: nominatim
+    spec:
+      # initContainers:
+      # - name: init-myservice #wait until service nominatim-db is ready
+      #   image: busybox:1.31.1
+      #   command: ['sh', '-c', 'until nslookup nominatim-db; do echo waiting for nominatim-db; sleep 2; done;']
+
+      containers:
+      - name: nominatim
+        image: mediagis/nominatim:4.4
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "16M"
+            cpu: "1m"
+          limits:
+            memory: "2048M"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PBF_URL 
+          valueFrom:
+            configMapKeyRef:
+              name: nominatim  
+              key: PBF_URL
+        - name: REPLICATION_URL 
+          valueFrom:
+            configMapKeyRef:
+              name: nominatim 
+              key: REPLICATION_URL
+        - name: REPLICATION_UPDATE_INTERVAL 
+          valueFrom:
+            configMapKeyRef:
+              name: nominatim  
+              key: REPLICATION_UPDATE_INTERVAL
+        - name: UPDATE_MODE 
+          valueFrom:
+            configMapKeyRef:
+              name: nominatim  
+              key: UPDATE_MODE
+        - name: REPLICATION_RECHECK_INTERVAL  
+          valueFrom:
+            configMapKeyRef:
+              name: nominatim  
+              key: REPLICATION_RECHECK_INTERVAL
+        - name: NOMINATIM_TOKENIZER  
+          value: "icu"
+        - name: NOMINATIM_DATABASE_DSN  
+          value: "pgsql:dbname=nominatim-data;hostaddr=10.103.126.75;user=admin;password=admin"
+        - name: PGHOSTADDR  
+          value: "10.103.126.75"
+        - name: PGDATABASE  
+          value: "nominatim-data"
+        - name: PGUSER 
+          valueFrom:
+            secretKeyRef:
+              name: nominatim-db  
+              key: POSTGRES_USER
+        - name: PGPASSWORD  
+          valueFrom:
+            secretKeyRef:
+              name: nominatim-db 
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: nominatim-storage
+          mountPath: /var/lib/nominatim
+      volumes:
+      - name: nominatim-storage
+        persistentVolumeClaim:
+          claimName: nominatim-storage

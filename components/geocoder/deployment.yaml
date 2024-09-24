@@ -29,7 +29,7 @@ spec:
         - containerPort: 8092
         env:
         - name: NOMINATIM_URL
-          value: "http://nominatim-service:8080"
+          value: "http://nominatim:8080"
         - name: PORT
           value: "8092"
     

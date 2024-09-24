@@ -11,5 +11,5 @@
    - name: http
      port: 8092
      targetPort: 8092
+     nodePort: 30920
    type: NodePort
-

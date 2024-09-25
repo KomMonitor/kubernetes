@@ -56,13 +56,13 @@ spec:
         volumeMounts:
         - name: nominatim-storage
           mountPath: /var/lib/nominatim
-        - name: nominatim-db-data
-          mountPath: /var/lib/postgresql/14/main
+        # - name: nominatim-db-data
+        #   mountPath: /var/lib/postgresql/14/main
       volumes:
       - name: nominatim-storage
         persistentVolumeClaim:
           claimName: nominatim-storage
-      - name: nominatim-db-data
-        persistentVolumeClaim:
-          claimName: nominatim-db-data
+      # - name: nominatim-db-data
+      #   persistentVolumeClaim:
+      #     claimName: nominatim-db-data
 

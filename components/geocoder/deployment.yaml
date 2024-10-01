@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geocode-proxy
+  labels:
+    app: geocode-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geocode-proxy
+  template:
+    metadata:
+      labels:
+        app: geocode-proxy
+    spec:
+      containers:
+      - name: geocode-proxy
+        image: kommonitor/geocoder-proxy
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "16M"
+            cpu: "1m"
+          limits:
+            memory: "500M"
+            cpu: "500m"
+        ports:
+        - containerPort: 8092
+        env:
+        - name: NOMINATIM_URL
+          value: "http://nominatim:8080"
+        - name: PORT
+          value: "8092"
+    
+        envFrom:
+        - configMapRef:
+            name: geocode-proxy
+        volumeMounts:
+        - name: openapi-config-volume
+          mountPath: /code/api/openapi.yaml  
+          subPath: openapi.yaml          
+      volumes:
+      - name: openapi-config-volume
+        configMap:
+          name: geocode-proxy
+          items:
+          - key: openapi.yaml
+            path: openapi.yaml

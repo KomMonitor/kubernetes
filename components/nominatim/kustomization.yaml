@@ -7,7 +7,5 @@ resources:
   - namespace.yaml
   - rolebinding.yaml
   - ingress.yaml
-  - pv.yaml
   - pvc.yaml
-  - secret.yaml
 

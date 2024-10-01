@@ -14,17 +14,45 @@ spec:
       labels:
         app: nominatim
     spec:
+      initContainers:
+        - name: init
+          image: mediagis/nominatim:4.4
+          resources:
+            limits:
+              memory: "3Gi"
+              cpu: "1000m"
+          command:
+            - bash
+          args:
+            - '-c'
+            - 'mkdir -p /var/lib/postgresql/14/main && sudo chown postgres:postgres /var/lib/postgresql/14/main && bash /app/init.sh'
+          env:
+            - name: PBF_URL 
+              valueFrom:
+                configMapKeyRef:
+                  name: nominatim  
+                  key: PBF_URL
+            - name: REPLICATION_URL 
+              valueFrom:
+                configMapKeyRef:
+                  name: nominatim 
+                  key: REPLICATION_URL
+          volumeMounts:
+            - name: nominatim-storage
+              mountPath: /var/lib/nominatim
+            - name: nominatim-db-data
+              mountPath: /var/lib/postgresql/14/
       containers:
       - name: nominatim
         image: mediagis/nominatim:4.4
         imagePullPolicy: Always
         resources:
           requests:
-            memory: "4Gi"
-            cpu: "1000m"
+            memory: "1Gi"
+            cpu: "100m"
           limits:
-            memory: "8Gi"
-            cpu: "2000m"
+            memory: "3Gi"
+            cpu: "1000m"
         ports:
         - containerPort: 8080
         env:
@@ -56,13 +84,13 @@ spec:
         volumeMounts:
         - name: nominatim-storage
           mountPath: /var/lib/nominatim
-        # - name: nominatim-db-data
-        #   mountPath: /var/lib/postgresql/14/main
+        - name: nominatim-db-data
+          mountPath: /var/lib/postgresql/14/
       volumes:
       - name: nominatim-storage
         persistentVolumeClaim:
           claimName: nominatim-storage
-      # - name: nominatim-db-data
-      #   persistentVolumeClaim:
-      #     claimName: nominatim-db-data
+      - name: nominatim-db-data
+        persistentVolumeClaim:
+          claimName: nominatim-db-data
 

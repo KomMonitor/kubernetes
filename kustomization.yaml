@@ -14,7 +14,7 @@ resources:
 images:
 - name: kommonitor/data-management
   newName: kommonitor/data-management
-  newTag: 4.1.5
+  newTag: 4.1.6
 - name: kommonitor/importer
   newName: kommonitor/importer
   newTag: 3.2.5
